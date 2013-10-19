@@ -29,23 +29,18 @@
 function StateMachine(description, elementToAttach)
 {
 	//Initialize object fields
-	this.stateTable = description;
+	this.stateTable = {};
 	this.currentState = null;
+	this.surface = elementToAttach;
+	var self = this;
+
 	//Create event for 30ms timer
 	this.timerObject = window.setInterval(function()
 	{
 		var timerEvent = new Event('timer');
 		elementToAttach.dispatchEvent(timerEvent);
 	}, 30);
-	//Add event listeners for all required events
-	elementToAttach.addEventListener('mousedown', this.handleEvent, false);
-	elementToAttach.addEventListener('mouseup', this.handleEvent, false);
-	elementToAttach.addEventListener('click', this.handleEvent, false);
-	elementToAttach.addEventListener('mousemove', this.handleEvent, false);
-	elementToAttach.addEventListener('mouseover', this.handleEvent, false);
-	elementToAttach.addEventListener('mouseout', this.handleEvent, false);
-	elementToAttach.addEventListener('keypress', this.handleEvent, false);
-	elementToAttach.addEventListener('timer', this.handleEvent, false);
+	
 	//Translate raw input event into suitable string
 	this.categorizeEvent = function(event)
 	{ 
@@ -71,8 +66,51 @@ function StateMachine(description, elementToAttach)
 				return 'unhandled';
 		}
 	}
-	this.handleEvent = function(event)
+	//Update current state
+	this.updateState = function(input_event, input_type)
 	{
-		var inputEvent = categorizeEvent(event);
+		var tempTransition = null;
+		for (var i = 0; i < self.currentState.length; i++)
+		{
+			tempTransition = self.currentState[i];
+			if (input_type === tempTransition.input)
+			{
+				tempTransition.action(input_event, self.surface);
+				self.currentState = self.stateTable[tempTransition.endState];
+				break;
+			}
+		}
 	}
+	//Respond to input event
+	this.handleEvent = function(inputEvent)
+	{
+		var inputType = self.categorizeEvent(inputEvent);
+		self.updateState(inputEvent, inputType);
+	}
+	//Add event listeners for all required events
+	elementToAttach.addEventListener('mousedown', this.handleEvent, false);
+	elementToAttach.addEventListener('mouseup', this.handleEvent, false);
+	elementToAttach.addEventListener('click', this.handleEvent, false);
+	elementToAttach.addEventListener('mousemove', this.handleEvent, false);
+	elementToAttach.addEventListener('mouseover', this.handleEvent, false);
+	elementToAttach.addEventListener('mouseout', this.handleEvent, false);
+	elementToAttach.addEventListener('keypress', this.handleEvent, false);
+	elementToAttach.addEventListener('timer', this.handleEvent, false);
+
+	//Parse state description into state table
+	this.parseDescription = function(inputDescription)
+	{
+		//Record initial state
+		var initialState = inputDescription.states[0].name;
+		var tempState = null;
+		//Create state table
+		for (var i = 0; i < inputDescription.states.length; i++)
+		{
+			tempState = inputDescription.states[i];
+			self.stateTable[tempState.name] = tempState.transitions;
+		}
+
+		//Initialize state machine
+		self.currentState = self.stateTable[initialState];
+	}(description);
 }
