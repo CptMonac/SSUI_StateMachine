@@ -24,14 +24,14 @@ function moveAction(inputEvent, inputElement)
 
     var raphaelElement = canvas.getById(inputElement.raphaelid);
     if (circle.attr('fill') == 'red')
-        circle.animate({cx: mouse.x, cy: mouse.y}, 300, 'easeInOut');
+        circle.animate({cx: mouse.x, cy: mouse.y}, 150, 'linear');
     else
     {    
         if (mouse.x > canvasWidth/2)
             mouse.x = 40;
         else
             mouse.x = canvasWidth - 40;
-        circle.animate({cx: mouse.x, cy: mouse.y}, 300, 'back-in');
+        circle.animate({cx: mouse.x, cy: mouse.y}, 150, 'back-in');
     }
 }
 
@@ -39,14 +39,9 @@ function heartPulse(inputEvent, inputElement)
 {
     var raphaelElement = canvas.getById(inputElement.raphaelid);
     if (raphaelElement.attr('fill') == 'red')
-        raphaelElement.animate({transform: 's1.05'}, 1000, 'elastic');
+        raphaelElement.animate({transform: 's1.1',cy: circle.attr('cy')+15}, 2000, 'elastic');
     else
-        raphaelElement.animate({transform: 's0.90'}, 1000, 'elastic');
-}
-
-function repulsedMouse(inputEvent, inputElement)
-{
-    console.log('not implemented');
+        raphaelElement.animate({transform: 's0.90',cy: circle.attr('cy')-15}, 2000, 'elastic');
 }
 
 function stateTest1()
@@ -55,8 +50,8 @@ function stateTest1()
     window.canvasHeight = 600;
     window.canvas = Raphael(1, 1, canvasWidth, canvasHeight);     
     var rectangle = canvas.rect(0, 0, canvasWidth, canvasHeight);
-    window.circle = canvas.circle(150, 100, 50);   // Create circle at x = 150, y = 100, with radius 30
-	circle.attr("fill", "red");
+    window.circle = canvas.circle(150, 100, 50);   
+	circle.attr("fill", 'red');
 
 	var circleStateTable = {
         states: [
