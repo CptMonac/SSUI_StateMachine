@@ -62,6 +62,16 @@ function emitPulsar(inputEvent, inputElement)
         mouseClick.y = inputEvent.clientY;
         inputElement.centerX = raphaelElement.attr('cx');
         inputElement.centerY = raphaelElement.attr('cy');
+        raphaelElement.stop();
+        circleContainer.exclude(raphaelElement);
+        raphaelElement.attr('opacity', 1.0);
+        raphaelElement.attr('fill', '#f00');
+        raphaelElement.transform('s1.0');
+    }
+    else 
+    {
+        raphaelElement.attr('fill', '#a30000');
+        circleContainer.push(raphaelElement);
     }
     console.log('pulsar!!!');
     
@@ -74,7 +84,7 @@ function stateTest3()
     window.circleCount = 5;
     window.mouseClick = {'x': 0, 'y': 0};
     window.canvas = Raphael(1, 1, canvasWidth, canvasHeight); 
-    window.circleContainer = canvas.set();    
+    window.circleContainer = canvas.set();   
     var rectangle = canvas.rect(0, 0, canvasWidth, canvasHeight);
     window.circleRadius = 15;
     window.timerCount = 0;
