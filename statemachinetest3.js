@@ -64,13 +64,13 @@ function emitPulsar(inputEvent, inputElement)
         inputElement.centerY = raphaelElement.attr('cy');
         raphaelElement.stop();
         circleContainer.exclude(raphaelElement);
-        raphaelElement.attr('opacity', 1.0);
         raphaelElement.attr('fill', '#f00');
-        raphaelElement.transform('s1.0');
+        raphaelElement.animate({r:circleRadius+10, opacity: 0.9},500, ">");
     }
     else 
     {
         raphaelElement.attr('fill', '#a30000');
+        raphaelElement.animate({r:circleRadius, opacity: 0},500, "<");
         circleContainer.push(raphaelElement);
     }
     console.log('pulsar!!!');
