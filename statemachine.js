@@ -87,6 +87,15 @@ function StateMachine(description, elementToAttach)
 		var inputType = self.categorizeEvent(inputEvent);
 		self.updateState(inputEvent, inputType);
 	}
+	this.resetTimer = function(inputTime)
+	{
+		window.clearInterval(self.timerObject);
+		self.timerObject = window.setInterval(function()
+		{
+			var timerEvent = new Event('timer');
+			elementToAttach.dispatchEvent(timerEvent);
+		}, inputTime);
+	}
 	//Add event listeners for all required events
 	elementToAttach.addEventListener('mousedown', this.handleEvent, false);
 	elementToAttach.addEventListener('mouseup', this.handleEvent, false);

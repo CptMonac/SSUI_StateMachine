@@ -1,5 +1,5 @@
 /*
-    Functionality:
+    Functionality: Beacon
         timer: pulsing circles
         dragAction: pulse circles faster
 
@@ -17,19 +17,23 @@ function addCircle()
     //Draw circle
     var circle = canvas.circle(centerX, centerY, circleRadius);
     circle.attr('fill', '#a30000');
+    circle.attr('opacity', 0.0);
+    circle.node.centerX = centerX;
+    circle.node.centerY = centerY;
     var stateMachine = new StateMachine(window.stateTable, circle.node);
+    stateMachine.resetTimer(100);
+    circleContainer.push(circle);
 }
 
 function moveCircle(inputEvent, inputElement)
 {
     var raphaelElement = canvas.getById(inputElement.raphaelid);
     var mousePosition = {'x': inputEvent.clientX, 'y': inputEvent.clientY};
-    var center = {'x': raphaelElement.attr('cx'), 'y': raphaelElement.attr('cy')};
     var horizontal_distance = (mousePosition.x - mouseClick.x);
     var vertical_distance = (mousePosition.y - mouseClick.y);
 
-    raphaelElement.attr('cx', center.x + horizontal_distance);
-    raphaelElement.attr('cy', center.y + vertical_distance);
+    raphaelElement.attr('cx', inputElement.centerX + horizontal_distance);
+    raphaelElement.attr('cy', inputElement.centerY + vertical_distance);
 }
 
 function pulseHeart(inputEvent, inputElement)
@@ -40,22 +44,14 @@ function pulseHeart(inputEvent, inputElement)
     {
         timerCount = 0;
         var raphaelElement = canvas.getById(inputElement.raphaelid);
-        raphaelElement.animate({opacity: 0.0, transform: 's0.1'}, 100, 'easeOut', function(){pulseDisappear(inputEvent, inputElement);});
+        circleContainer.animate(
+        {
+            "0%":{transform: 's0.2', opacity: 0.0},
+            "20%":{opacity: 1.0},
+            "80%":{transform: 's1.2', opacity: 0.0}
+        },1500, 'easeOut');
     }
 }
-
-function pulseDisappear(inputEvent, inputElement)
-{
-    var raphaelElement = canvas.getById(inputElement.raphaelid);
-    raphaelElement.animate({opacity: 1.0}, 100, 'easeOut', function(){pulseEmergence(inputEvent, inputElement);});
-}
-
-function pulseEmergence(inputEvent, inputElement)
-{
-    var raphaelElement = canvas.getById(inputElement.raphaelid);
-    raphaelElement.animate({opacity: 0.0, transform: 's1.2'}, 100, 'easeOut');
-}
-
 
 function emitPulsar(inputEvent, inputElement)
 {
@@ -64,6 +60,8 @@ function emitPulsar(inputEvent, inputElement)
     {
         mouseClick.x = inputEvent.clientX;
         mouseClick.y = inputEvent.clientY;
+        inputElement.centerX = raphaelElement.attr('cx');
+        inputElement.centerY = raphaelElement.attr('cy');
     }
     console.log('pulsar!!!');
     
@@ -75,9 +73,10 @@ function stateTest3()
     window.canvasHeight = 600;
     window.circleCount = 5;
     window.mouseClick = {'x': 0, 'y': 0};
-    window.canvas = Raphael(1, 1, canvasWidth, canvasHeight);     
+    window.canvas = Raphael(1, 1, canvasWidth, canvasHeight); 
+    window.circleContainer = canvas.set();    
     var rectangle = canvas.rect(0, 0, canvasWidth, canvasHeight);
-    window.circleRadius = 50;
+    window.circleRadius = 15;
     window.timerCount = 0;
     window.stateTable = {
         states: [
