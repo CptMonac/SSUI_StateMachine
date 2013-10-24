@@ -9,7 +9,7 @@ function heartPulse(inputEvent, inputElement)
 {
     var raphaelElement = canvas.getById(inputElement.raphaelid);
     if (ellipse.attr('cy') != center.y)
-        raphaelElement.animate({cy: ellipse.attr('cy')- pulseAmount, ry: radius+10, rx: radius-10}, 400, 'bounce'); //easeout
+        raphaelElement.animate({cy: ellipse.attr('cy')- pulseAmount, ry: radius+10, rx: radius-10}, 250, 'bounce'); //easeout
     else
         raphaelElement.animate({cy: ellipse.attr('cy')+ pulseAmount, ry: radius-10, rx: radius+10}, 250, 'easeIn', function(){heartPulse(inputEvent, inputElement)});
 }
