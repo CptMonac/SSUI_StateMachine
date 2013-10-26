@@ -84,20 +84,20 @@ function dragStart()
         circle.attr('stroke', 'red');
         this.concentricContainer.push(circle);
     }
-    this.animationContainer = canvas.set(this, this.concentricContainer);
 }
 
-function dragMove(dx, dy, x, y)
+function dragMove(dx, dy)
 {
-    this.animationContainer.attr('cx',this.center.x + dx);
-    this.animationContainer.attr('cy',this.center.y + dy);
+    this.touchLocation = {'x': this.center.x+dx, 'y': this.center.y+dy};
+    this.concentricContainer.attr('cx',this.touchLocation.x);
+    this.concentricContainer.attr('cy',this.touchLocation.y);
 } 
 
 function dragEnd()
 {
     this.attr('fill', '#a30000');
     this.concentricContainer.animate({transform: 's0'}, 1000, 'linear');
-    this.animate({r:circleRadius, opacity: 0},500, "<");
+    this.animate({r:circleRadius, opacity: 0, cx: this.touchLocation.x, cy: this.touchLocation.y},800, "<");
     circleContainer.push(this);
 }
 
