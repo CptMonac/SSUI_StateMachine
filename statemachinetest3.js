@@ -1,7 +1,7 @@
 /*
     Functionality: Beacon
         timer: pulsing circles
-        dragAction: pulse circles faster
+        dragAction: emanate pulsar
 
         http://bl.ocks.org/mbostock/4503672
         http://jsfiddle.net/Fy8vD/
@@ -28,12 +28,10 @@ function addCircle()
 function moveCircle(inputEvent, inputElement)
 {
     var raphaelElement = canvas.getById(inputElement.raphaelid);
-    var mousePosition = {'x': inputEvent.clientX, 'y': inputEvent.clientY};
-    var horizontal_distance = (mousePosition.x - mouseClick.x);
-    var vertical_distance = (mousePosition.y - mouseClick.y);
-
-    raphaelElement.attr('cx', inputElement.centerX + horizontal_distance);
-    raphaelElement.attr('cy', inputElement.centerY + vertical_distance);
+    raphaelElement.attr('cx', inputEvent.pageX);
+    raphaelElement.attr('cy', inputEvent.pageY);
+    raphaelElement.concentricContainer.attr('cx', inputEvent.pageX);
+    raphaelElement.concentricContainer.attr('cy', inputEvent.pageY);
 }
 
 function pulseHeart(inputEvent, inputElement)
@@ -56,25 +54,35 @@ function pulseHeart(inputEvent, inputElement)
 function emitPulsar(inputEvent, inputElement)
 {
     var raphaelElement = canvas.getById(inputElement.raphaelid);
+    var center = {'x': raphaelElement.attr('cx'), 'y': raphaelElement.attr('cy')};
+    
     if (inputEvent.type === 'mousedown')
     {
-        mouseClick.x = inputEvent.clientX;
-        mouseClick.y = inputEvent.clientY;
-        inputElement.centerX = raphaelElement.attr('cx');
-        inputElement.centerY = raphaelElement.attr('cy');
+        raphaelElement.attr('cx', inputEvent.pageX);
+        raphaelElement.attr('cy', inputEvent.pageY);
+        raphaelElement.concentricContainer = canvas.set();
         raphaelElement.stop();
         circleContainer.exclude(raphaelElement);
+        //raphaelElement.attr('fill', 'red');
         raphaelElement.attr('fill', '#f00');
         raphaelElement.animate({r:circleRadius+10, opacity: 0.9},500, ">");
+
+        for (var i = 0; i < 6; i++)
+        {
+            var circle = canvas.circle(center.x, center.y, circleRadius+(3*i));
+            circle.attr('stroke', 'red');
+            raphaelElement.concentricContainer.push(circle);
+        }
+        raphaelElement.concentricContainer.animate({transform: 's2.0'}, 500, 'linear');
     }
     else 
     {
         raphaelElement.attr('fill', '#a30000');
+        if (typeof raphaelElement.concentricContainer != 'undefined')
+            raphaelElement.concentricContainer.remove(); 
         raphaelElement.animate({r:circleRadius, opacity: 0},500, "<");
         circleContainer.push(raphaelElement);
-    }
-    console.log('pulsar!!!');
-    
+    }   
 }
 
 function stateTest3()
@@ -82,7 +90,6 @@ function stateTest3()
 	window.canvasWidth = 500;
     window.canvasHeight = 600;
     window.circleCount = 5;
-    window.mouseClick = {'x': 0, 'y': 0};
     window.canvas = Raphael(1, 1, canvasWidth, canvasHeight); 
     window.circleContainer = canvas.set();   
     var rectangle = canvas.rect(0, 0, canvasWidth, canvasHeight);
