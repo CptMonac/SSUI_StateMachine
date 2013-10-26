@@ -20,6 +20,7 @@ function addCircle()
     circle.attr('opacity', 0.0);
     circle.node.centerX = centerX;
     circle.node.centerY = centerY;
+    circle.drag(dragMove, dragStart, dragEnd);
     var stateMachine = new StateMachine(window.stateTable, circle.node);
     stateMachine.resetTimer(100);
     circleContainer.push(circle);
@@ -56,33 +57,48 @@ function emitPulsar(inputEvent, inputElement)
     var raphaelElement = canvas.getById(inputElement.raphaelid);
     var center = {'x': raphaelElement.attr('cx'), 'y': raphaelElement.attr('cy')};
     
-    if (inputEvent.type === 'mousedown')
+    if (typeof raphaelElement.concentricContainer === 'undefined')
     {
-        raphaelElement.attr('cx', inputEvent.pageX);
-        raphaelElement.attr('cy', inputEvent.pageY);
-        raphaelElement.concentricContainer = canvas.set();
-        raphaelElement.stop();
-        circleContainer.exclude(raphaelElement);
-        //raphaelElement.attr('fill', 'red');
-        raphaelElement.attr('fill', '#f00');
-        raphaelElement.animate({r:circleRadius+10, opacity: 0.9},500, ">");
-
         for (var i = 0; i < 6; i++)
         {
             var circle = canvas.circle(center.x, center.y, circleRadius+(3*i));
             circle.attr('stroke', 'red');
             raphaelElement.concentricContainer.push(circle);
         }
-        raphaelElement.concentricContainer.animate({transform: 's2.0'}, 500, 'linear');
     }
-    else 
+    raphaelElement.concentricContainer.animate({transform: 's0'}, 500, 'linear');
+}
+
+function dragStart()
+{
+    this.center = {'x': this.attr('cx'), 'y': this.attr('cy')};
+    this.concentricContainer = canvas.set();
+    this.stop();
+    circleContainer.exclude(this);
+    this.attr('fill', '#f00');
+    this.animate({r:circleRadius+10, opacity: 0.9},500, ">");
+
+    for (var i = 0; i < 6; i++)
     {
-        raphaelElement.attr('fill', '#a30000');
-        if (typeof raphaelElement.concentricContainer != 'undefined')
-            raphaelElement.concentricContainer.remove(); 
-        raphaelElement.animate({r:circleRadius, opacity: 0},500, "<");
-        circleContainer.push(raphaelElement);
-    }   
+        var circle = canvas.circle(this.center.x, this.center.y, circleRadius+(3*i));
+        circle.attr('stroke', 'red');
+        this.concentricContainer.push(circle);
+    }
+    this.animationContainer = canvas.set(this, this.concentricContainer);
+}
+
+function dragMove(dx, dy, x, y)
+{
+    this.animationContainer.attr('cx',this.center.x + dx);
+    this.animationContainer.attr('cy',this.center.y + dy);
+} 
+
+function dragEnd()
+{
+    this.attr('fill', '#a30000');
+    this.concentricContainer.animate({transform: 's0'}, 1000, 'linear');
+    this.animate({r:circleRadius, opacity: 0},500, "<");
+    circleContainer.push(this);
 }
 
 function stateTest3()
@@ -104,21 +120,11 @@ function stateTest3()
                     input: 'timerTick30Ms', 
                     action: pulseHeart,
                     endState: 'freedom'
-                },
-                {
-                    input: 'mouseDown',
-                    action: emitPulsar,
-                    endState: 'control'
                 }]
         },
         {
             name: "control",
             transitions: [
-                {
-                    input: 'mouseMove',
-                    action: moveCircle,
-                    endState: 'control'
-                },
                 {
                     input: 'mouseOut',
                     action: emitPulsar,
