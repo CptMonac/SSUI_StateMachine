@@ -103,7 +103,7 @@ function StateMachine(description, elementToAttach)
 	elementToAttach.addEventListener('mousemove', this.handleEvent, false);
 	elementToAttach.addEventListener('mouseover', this.handleEvent, false);
 	elementToAttach.addEventListener('mouseout', this.handleEvent, false);
-	elementToAttach.addEventListener('keypress', this.handleEvent, false);
+	window.addEventListener('keypress', this.handleEvent, false);
 	elementToAttach.addEventListener('timer', this.handleEvent, false);
 
 	//Parse state description into state table

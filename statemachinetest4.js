@@ -24,6 +24,31 @@ function addCircle()
     var stateMachine = new StateMachine(window.stateTable, circle.node);
     stateMachine.resetTimer(100);
     circleContainer.push(circle);
+
+    //Animate initial position
+    window.marker = canvas.set();
+    for (var i = 0; i < 6; i++)
+    {
+        var circle = canvas.circle(centerX, centerY, circleRadius+(3*i));
+        circle.attr('stroke', 'red');
+        window.marker.push(circle);
+    }
+    window.marker.animate({transform: 's0'}, 500, 'linear');
+}
+
+function handleKeyPress(inputEvent, inputElement)
+{
+    if (inputEvent.keyCode === 32)
+    {
+        if (keyPressCount < circleContainer.length)
+            keyPressCount++;
+        else
+        {
+            console.log('new circle');
+            keyPressCount = 1;
+            addCircle();
+        }
+    }
 }
 
 function moveCircle(inputEvent, inputElement)
@@ -37,7 +62,7 @@ function moveCircle(inputEvent, inputElement)
 
 function pulseHeart(inputEvent, inputElement)
 {
-    if (timerCount < 100)
+    if (timerCount < (circleContainer.length*10))
         timerCount++;
     else
     {
@@ -48,7 +73,7 @@ function pulseHeart(inputEvent, inputElement)
             "0%":{transform: 's0.2', opacity: 0.0},
             "20%":{opacity: 1.0},
             "80%":{transform: 's1.2', opacity: 0.0}
-        },1500, 'easeOut');
+        },1000, 'easeOut');
     }
 }
 
@@ -107,11 +132,13 @@ function stateTest3()
 	window.canvasWidth = 500;
     window.canvasHeight = 600;
     window.circleCount = 5;
+    window.pulseComplete = true;
     window.canvas = Raphael(1, 1, canvasWidth, canvasHeight); 
     window.circleContainer = canvas.set();   
     var rectangle = canvas.rect(0, 0, canvasWidth, canvasHeight);
     window.circleRadius = 15;
     window.timerCount = 0;
+    window.keyPressCount = 1;
     window.stateTable = {
         states: [
         {
@@ -120,6 +147,11 @@ function stateTest3()
                 {
                     input: 'timerTick30Ms', 
                     action: pulseHeart,
+                    endState: 'freedom'
+                },
+                {
+                    input: 'keyPress',
+                    action: handleKeyPress,
                     endState: 'freedom'
                 }]
         },
