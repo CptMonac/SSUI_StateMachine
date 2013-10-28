@@ -32,7 +32,7 @@ function addCircle()
     circle.attr('stroke', '#c7141a');
     circle.attr('stroke-width', 3);
     circle.drag(dragMove, dragStart, dragEnd);
-    circle.stopPulse = false;
+    circle.pulsar = false;
  
     //Add circle to state machine
     var stateMachine = new StateMachine(window.stateTable, circle.node);
@@ -55,13 +55,11 @@ function handleKeyPress(inputEvent, inputElement)
     }
 }
 
-
-
 function pulseHeart(inputEvent, inputElement)
 {
     //Add sphere of influence field to circle
     var raphaelElement = canvas.getById(inputElement.raphaelid);
-    if (!raphaelElement.stopPulse)
+    if (raphaelElement.pulsar)
     {
         var field = raphaelElement.clone();
         field.attr('stroke', '#c7141a');
@@ -69,12 +67,21 @@ function pulseHeart(inputEvent, inputElement)
         var expandAnimation = Raphael.animation({r: 160, "stroke-width": 1, "stroke-opacity": 1e-6, stroke: 'brown'},6000, 'linear', function(){this.remove();});
         field.animate(expandAnimation);
     }
+    else
+    {
+        raphaelElement.animate(
+        {
+            "0%":{transform: 's0.5', opacity: 0.0},
+            "20%":{opacity: 1.0},
+            "100%":{transform: 's1.2', opacity: 0.0}
+        },700, 'easeOut');
+    }
 }
 
 function dragStart()
 {
     this.center = {'x': this.attr('cx'), 'y': this.attr('cy')};
-    this.stopPulse = true;
+    this.pulsar = true;
     this.attr('fill', '#c0392b');
     this.animate({r:circleRadius+10, opacity: 0.9},500, ">");
 }
@@ -89,7 +96,7 @@ function dragEnd()
 {
     this.attr('fill', '#c7141a');
     this.animate({r:circleRadius, opacity: 1.0},500, "<");
-    this.stopPulse = false;
+    this.pulsar = false;
 }
 
 function stateTest3()
