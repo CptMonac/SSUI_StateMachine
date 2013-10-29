@@ -8,6 +8,8 @@
         ------------------------------
         http://checkthis.com/--flu
         https://developer.mozilla.org/en-US/demos/detail/urban-arteries, http://www.clicktorelease.com/code/urban-arteries/
+        https://code.google.com/p/android-labs/source/browse/trunk/NoiseAlert/src/com/google/android/noisealert/SoundMeter.java
+        http://www.funf.org/about.html
         --------------------------
         Project Ideas:
         Real-time traffic visualization
