@@ -10,15 +10,6 @@
         https://developer.mozilla.org/en-US/demos/detail/urban-arteries, http://www.clicktorelease.com/code/urban-arteries/
         https://code.google.com/p/android-labs/source/browse/trunk/NoiseAlert/src/com/google/android/noisealert/SoundMeter.java
         http://www.funf.org/about.html
-        --------------------------
-        Project Ideas:
-        Real-time traffic visualization
-        Interactive map of wifi locations/hotspots
-        Interactive map of bus/train locations
-        Real-time bus arrival/departure times combined with urban arteries
-        Map of water fountains/restrooms
-        Map of blind crosswalks in pgh
-
 */
 function addCircle()
 {
@@ -50,7 +41,6 @@ function handleKeyPress(inputEvent, inputElement)
             keyPressCount++;
         else
         {
-            console.log('new circle');
             keyPressCount = 1;
             addCircle();
         }
@@ -61,11 +51,14 @@ function pulseHeart(inputEvent, inputElement)
 {
     //Add sphere of influence field to circle
     var raphaelElement = canvas.getById(inputElement.raphaelid);
-    if (raphaelElement.pulsar)
+    if (!raphaelElement.pulsar)
     {
+        raphaelElement.attr('opacity', 1);
         var field = raphaelElement.clone();
         field.attr('stroke', '#c7141a');
         field.attr('fill-opacity', 0);
+        field.parentElement = raphaelElement;
+        field.drag(dragMove, dragStart, dragEnd);
         var expandAnimation = Raphael.animation({r: 160, "stroke-width": 1, "stroke-opacity": 1e-6, stroke: 'brown'},6000, 'linear', function(){this.remove();});
         field.animate(expandAnimation);
     }
@@ -82,23 +75,57 @@ function pulseHeart(inputEvent, inputElement)
 
 function dragStart()
 {
-    this.center = {'x': this.attr('cx'), 'y': this.attr('cy')};
-    this.pulsar = true;
-    this.attr('fill', '#c0392b');
-    this.animate({r:circleRadius+10, opacity: 0.9},500, ">");
+    if (typeof this.parentElement === 'undefined')
+    {
+        this.center = {'x': this.attr('cx'), 'y': this.attr('cy')};
+        this.pulsar = true;
+        this.attr('fill', '#c0392b');
+        this.animate({r:circleRadius+10, opacity: 0.9},500, ">");
+    }
+    else
+    {
+        this.parentElement.center = {'x': this.attr('cx'), 'y': this.attr('cy')};
+        this.parentElement.pulsar = true;
+        this.parentElement.attr('fill', '#c0392b');
+        this.parentElement.animate({r:circleRadius+10, opacity: 0.9},500, ">");
+    }
+}
+
+function handleMouseDown(inputEvent, inputElement)
+{
+    var raphaelElement = canvas.getById(inputElement.raphaelid);
+    console.log('down');
+    inputElement.center = {'x': raphaelElement.attr('cx'), 'y': raphaelElement.attr('cy')};
 }
 
 function dragMove(dx, dy)
 {
-    this.attr('cx',this.center.x + dx);
-    this.attr('cy',this.center.y + dy);
+    if (typeof this.parentElement === 'undefined')
+    {
+        this.attr('cx',this.center.x + dx);
+        this.attr('cy',this.center.y + dy);
+    }
+    else
+    {
+        this.parentElement.attr('cx',this.parentElement.center.x + dx);
+        this.parentElement.attr('cy',this.parentElement.center.y + dy);
+    }
 } 
 
 function dragEnd()
 {
-    this.attr('fill', '#c7141a');
-    this.animate({r:circleRadius, opacity: 1.0},500, "<");
-    this.pulsar = false;
+    if (typeof this.parentElement === 'undefined')
+    {
+        this.attr('fill', '#c7141a');
+        this.animate({r:circleRadius, opacity: 1.0},500, "<");
+        this.pulsar = false;
+    }
+    else
+    {
+        this.parentElement.attr('fill', '#c7141a');
+        this.parentElement.animate({r:circleRadius, opacity: 1.0},500, "<");
+        this.parentElement.pulsar = false;   
+    }
 }
 
 function stateTest3()
@@ -126,6 +153,11 @@ function stateTest3()
                 {
                     input: 'keyPress',
                     action: handleKeyPress,
+                    endState: 'freedom'
+                },
+                {
+                    input: 'mouseDown',
+                    action: handleMouseDown,
                     endState: 'freedom'
                 }]
         }]

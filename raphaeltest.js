@@ -1,4 +1,12 @@
 // Creates canvas 320 × 200 at 10, 50
+/*Project Ideas:
+        Real-time traffic visualization
+        Interactive map of wifi locations/hotspots
+        Interactive map of bus/train locations
+        Real-time bus arrival/departure times combined with urban arteries
+        Map of water fountains/restrooms
+        Map of blind crosswalks in pgh
+*/
 function start()
 {
 	var displ = 15;
